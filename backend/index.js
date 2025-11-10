@@ -4,6 +4,8 @@ import { connectDB } from "./config/db.js";
 import { clerkMiddleware } from "@clerk/express";
 import userRoutes from "./routes/user.route.js";
 import postRoutes from "./routes/post.route.js";
+import commentRoutes from "./routes/comment.route.js";
+import colors from "colors";
 
 const app = express();
 app.use(express.json());
@@ -16,9 +18,10 @@ app.get("/", (req, res) => {
 
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
+app.use("/api/comments", commentRoutes);
 
 // error handling middleware
-app.use((err, req, res) => {
+app.use((err, req, res, next) => {
   console.error("Unhandled error: ", err);
   res.status(500).json({ error: err.message || "Internal server error" });
 });
@@ -27,7 +30,7 @@ const startServer = async () => {
   try {
     await connectDB();
     app.listen(ENV.PORT, () => {
-      console.log(`Server is running on PORT: `.bgMagenta, ENV.PORT);
+      console.log(`Server is running on PORT: ${ENV.PORT}`.bgMagenta);
     });
   } catch (error) {
     console.error("Failed to start server: ", error.message);

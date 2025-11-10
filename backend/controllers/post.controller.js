@@ -1,7 +1,10 @@
 import asyncHandler from "express-async-handler";
 import Post from "../models/post.model.js";
-import { getAuth, User } from "@clerk/express";
+import { getAuth } from "@clerk/express";
+import User from "../models/user.model.js";
 import cloudinary from "../config/cloudinary.js";
+import Notification from "../models/notification.model.js";
+import Comment from "../models/comment.model.js";
 
 export const getPosts = asyncHandler(async (req, res) => {
   const posts = await Post.find()
@@ -83,7 +86,7 @@ export const createPost = asyncHandler(async (req, res) => {
 
       const uploadResponse = await cloudinary.uploader.upload(base64Image, {
         folder: "social_media_posts",
-        resoruce_type: "image",
+        resource_type: "image",
         transformation: [
           { width: 800, height: 600, crop: "limit" },
           { quality: "auto" },
@@ -114,7 +117,7 @@ export const likePost = asyncHandler(async (req, res) => {
   const post = await Post.findById(postId);
 
   if (!user || !post) {
-    return res.status(404).json({ erorr: "User or post not found" });
+    return res.status(404).json({ error: "User or post not found" });
   }
 
   const isLiked = post.likes.includes(user._id);
