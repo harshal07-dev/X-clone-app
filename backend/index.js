@@ -1,9 +1,38 @@
 import express from "express";
+import { ENV } from "./config/env.js";
+import { connectDB } from "./config/db.js";
+import { clerkMiddleware } from "@clerk/express";
+import userRoutes from "./routes/user.route.js";
+import postRoutes from "./routes/post.route.js";
 
 const app = express();
+app.use(express.json());
 
-const PORT = process.env.PORT || 5000;
+app.use(clerkMiddleware());
 
-app.listen(PORT, () => {
-  console.log(`Server is running on ${PORT}`);
+app.get("/", (req, res) => {
+  res.send("Hola from server");
 });
+
+app.use("/api/users", userRoutes);
+app.use("/api/posts", postRoutes);
+
+// error handling middleware
+app.use((err, req, res) => {
+  console.error("Unhandled error: ", err);
+  res.status(500).json({ error: err.message || "Internal server error" });
+});
+
+const startServer = async () => {
+  try {
+    await connectDB();
+    app.listen(ENV.PORT, () => {
+      console.log(`Server is running on PORT: `.bgMagenta, ENV.PORT);
+    });
+  } catch (error) {
+    console.error("Failed to start server: ", error.message);
+    process.exit(1);
+  }
+};
+
+startServer();
