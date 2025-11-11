@@ -23,8 +23,8 @@ export const createComment = asyncHandler(async (req, res) => {
 
     if(!content || content.trim() === "") {
         return res.status(400).json({
-            error: "Comment content is required";
-        })
+            error: "Comment content is required"
+        });
     }
     const user = await User.findOne({clerkId: userId});
     const post = await Post.findById(postId);
